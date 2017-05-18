@@ -92,7 +92,7 @@
 		syscall
 		jal mm
 	
-	Exit:
+	Exit:  			#exits the program
 		li $v0 10
 		syscall
 	
@@ -107,7 +107,7 @@
 		la $a3, arrA
 		la $a2, arrB
 		la $a1, arrC
-		li $t7, 0
+		li $t7, 2
 		li $t8, 1 #flag_for_condition_BOOLEAN_TRUE
 		li $s0, 0
 
@@ -115,15 +115,39 @@
 		li $s1, 0
 	
 	loop2:
-		li $s2, 0
-		sll $t2, $s2, 2
-		addi $t2, $t2, $s1
-		sll $t2, $t2, 3
-		addi $t2, $t2, $a2
-		ldc1 $f20, ($t2)
+		li $s2, 0 	    	# k = 0
+		sll $t2, $s0, 1		#initilizing Array C
+		addi $t2, $t2, $s1	#
+		sll $t2, $t2, 3		# (2*i+j)*8 + BaseAddress
+		addi $t2, $t2, $a1	#
+		ldc1 $f20, 0($t2) 	 # $f20 = C[][]
 
 	loop3:
-		li $t0, $s0, 1
+		sll $t0, $s2, 1     #initializing Array B
+		addi $t0, $t0, $s1 	#
+		sll $t0, $t0, 3		#  (2*j+k)*8 + BaseAddress
+		addi $t0, $t0, $a2	#
+		ldc1 $f22, 0($t0) 	# $f22 = B[][]
+		
+		sll $t0, $s0, 1 	#initilizing Array A
+		addi $t0, $t0, $s2  #
+		sll $t0, $t0, 3		# (2*i+k)*8 + Base Address
+		addi $t0, $t0, $a3 	#
+		ldc1 $f24, 0($t0)	# $f22 = A[][]
+
+		mul.d $f24, $f24, $f22
+		add.d $f20, $f20, $f24
+		
+		addi $s2, $s2, 1
+
+		blt $s2, $t7, loop3
+		sdc1 $f20, 0($t2)
+
+		addi $s1, $s1, 1
+
+
+		
+
 
 
 	
